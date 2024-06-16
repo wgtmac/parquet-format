@@ -448,7 +448,7 @@ struct BsonType {
  */
 enum GeometryEncoding {
   /**
-   * Allowed for phyiscal type: BYTE_ARRAY.
+   * Allowed for physical type: BYTE_ARRAY.
    *
    * Well-known binary (WKB) representations of geometries. It supports 2D or
    * 3D geometries of the standard geometry types (Point, LineString, Polygon,
@@ -468,7 +468,7 @@ enum GeometryEncoding {
  */
 struct GeometryType {
   /**
-   * Phyiscal type and encoding for the geometry type. Please refer to the
+   * Physical type and encoding for the geometry type. Please refer to the
    * definition of GeometryEncoding for more detail.
    */
   1: required GeometryEncoding encoding;
