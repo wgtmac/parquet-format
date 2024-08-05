@@ -249,16 +249,21 @@ enum Edges {
 
 /**
  * A custom WKB-encoded polygon or multi-polygon to represent a covering of
- * geometries. For example, it may be a bounding box, or an evelope of geometries
- * when a bounding box cannot be built (e.g. a geometry has spherical edges, or if
+ * geometries. For example, it may be a bounding box or an envelope of geometries
+ * when a bounding box cannot be built (e.g., a geometry has spherical edges, or if
  * an edge of geographic coordinates crosses the antimeridian). In addition, it can
  * also be used to provide vendor-agnostic coverings like S2 or H3 grids.
  */
 struct Covering {
-  /** Bytes of a WKB-encoded geometry */
-  1: required binary geometry;
-  /** Edges of the geometry, which is independent of edges from the logical type */
-  2: required Edges edges;
+  /**
+   * Specifies the type of covering. Currently, the accepted value is "bbox".
+   */
+  1: required string kind;
+
+  /**
+   * Contains the values for the specified covering kind.
+   */
+  2: required string value;
 }
 
 /**
@@ -487,15 +492,20 @@ struct GeometryType {
    */
   2: required Edges edges;
   /**
-   * Coordinate Reference System, i.e. mapping of how coordinates refer to
-   * precise locations on earth, e.g. OGC:CRS84
+   * Specifies the type of covering. Currently, the accepted value is "PROJJSON".
    */
-  3: optional string crs;
+  3: optional string crs_kind;
+  /**
+   * PROJJSON object representing the Coordinate Reference System (CRS) of the geometry.
+   * If the field is not provided, the default CRS is OGC:CRS84, which means the data in
+   * this column must be stored in longitude, latitude based on the WGS84 datum.
+   */
+  4: optional string crs;
   /**
    * Additional informative metadata.
    * It can be used by GeoParquet to offload some of the column metadata.
    */
-  4: optional binary metadata;
+  5: optional binary metadata;
 }
 
 /**
