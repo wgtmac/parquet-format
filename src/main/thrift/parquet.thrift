@@ -288,15 +288,15 @@ enum Edges {
  * Bounding box of geometries in the representation of min/max value pair of
  * coordinates from each axis when Edges is planar. Values of Z and M are omitted
  * for 2D geometries. When Edges is spherical, the bounding box is in the form of
- * [westmost, southmost, eastmost, northmost], with necessary min/max values for
+ * [westmost, eastmost, southmost, northmost], with necessary min/max values for
  * Z and M if needed.
  */
 struct BoundingBox {
   /** Westmost value if edges = spherical **/
   1: required double xmin;
-  /** Southmost valueif edges = spherical **/
-  2: required double xmax;
   /** Eastmost value if edges = spherical **/
+  2: required double xmax;
+  /** Southmost value if edges = spherical **/
   3: required double ymin;
   /** Northmost value if edges = spherical **/
   4: required double ymax;
