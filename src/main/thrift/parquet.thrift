@@ -491,23 +491,23 @@ struct GeometryType {
   1: required GeometryEncoding encoding;
   /**
    * Interpretation for edges of elements of a GEOMETRY logical type, i.e. whether
-   * the interpolation between points along an edge represents a straight cartesian
-   * line or the shortest line on the sphere.
+   * the interpolation between points along an edge represents a straight line in
+   * Euclidean space or the shortest line on the sphere.
    * Please refer to the definition of Edges for more detail.
    */
   2: required Edges edges;
   /**
-   * CRS (coordinate reference system) is a mapping of how coordinates refer to
-   * precise locations on earth. A crs is specified by a string, which is a Parquet
-   * file metadata field whose value is the crs representation. An additional field
-   * with the suffix '.type' describes the encoding of this CRS representation.
+   * CRS (coordinate reference system) is a description of how coordinates refer to
+   * precise locations on earth. A CRS is specified by a string, which is a Parquet
+   * file metadata field whose value is the CRS representation. An additional field
+   * with the suffix '.encoding' describes the encoding of this CRS representation.
    *
    * For example, if a geometry column (e.g., 'geom1') uses the CRS 'OGC:CRS84', the
-   * writer may create 2 file metadata fields: 'geom1_crs' and 'geom1_crs.type', and
-   * set the 'crs' field to 'geom1_crs'. The 'geom1_crs' field will contain the
+   * writer may create 2 file metadata fields: 'geom1_crs' and 'geom1_crs.encoding',
+   * and set the 'crs' field to 'geom1_crs'. The 'geom1_crs' field may contain the
    * PROJJSON representation of OGC:CRS84
    * (https://github.com/opengeospatial/geoparquet/blob/main/format-specs/geoparquet.md#ogccrs84-details),
-   * and the 'geom1_crs.type' field will contain the string 'PROJJSON'.
+   * and the 'geom1_crs.encoding' field would contain the string 'PROJJSON'.
    *
    * Multiple geometry columns can refer to the same CRS metadata field
    * (e.g., 'geom1_crs') if they share the same CRS.
