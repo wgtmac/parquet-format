@@ -292,20 +292,20 @@ enum Edges {
 /**
  * Bounding box of geometries in the representation of min/max value pair of
  * coordinates from each axis when the coordinate system is Cartesian.
- * Values of Z and M are omitted for 2D geometries. When the coordinate system
- * is spherical or ellipsoidal, the bounding box is in the form of
- * [westmost, eastmost, southmost, northmost], with necessary min/max values for
- * Z and M if needed. Note that the westmost value may be greater than the
- * eastmost value if the bounding box crosses the anti-meridian.
+ * Values of Z and M are omitted for 2D geometries. When the edges are geodesics,
+ * the bounding box is in the form of [westmost, eastmost, southmost, northmost],
+ * with necessary min/max values for Z and M if needed. Note that the westmost
+ * value may be greater than the eastmost value if the bounding box crosses the
+ * anti-meridian.
  */
 struct BoundingBox {
-  /** Westmost value if the coordinate system is spherical **/
+  /** Westmost value if the edges are geodesics **/
   1: required double xmin;
-  /** Eastmost value if the coordinate system is spherical **/
+  /** Eastmost value if the edges are geodesics **/
   2: required double xmax;
-  /** Southmost value if the coordinate system is spherical **/
+  /** Southmost value if the edges are geodesics **/
   3: required double ymin;
-  /** Northmost value if the coordinate system is spherical **/
+  /** Northmost value if the edges are geodesics **/
   4: required double ymax;
   5: optional double zmin;
   6: optional double zmax;
@@ -941,7 +941,7 @@ struct ColumnMetaData {
   /** total byte size of all uncompressed pages in this column chunk (including the headers) **/
   6: required i64 total_uncompressed_size
 
-  /** total byte size of all compressed, and potentially encrypted, pages 
+  /** total byte size of all compressed, and potentially encrypted, pages
    *  in this column chunk (including the headers) **/
   7: required i64 total_compressed_size
 
@@ -1056,10 +1056,10 @@ struct RowGroup {
    * in this row group **/
   5: optional i64 file_offset
 
-  /** Total byte size of all compressed (and potentially encrypted) column data 
+  /** Total byte size of all compressed (and potentially encrypted) column data
    *  in this row group **/
   6: optional i64 total_compressed_size
-  
+
   /** Row group ordinal in the file **/
   7: optional i16 ordinal
 }
@@ -1124,7 +1124,7 @@ union ColumnOrder {
    *     - If the min is +0, the row group may contain -0 values as well.
    *     - If the max is -0, the row group may contain +0 values as well.
    *     - When looking for NaN values, min and max should be ignored.
-   * 
+   *
    *     When writing statistics the following rules should be followed:
    *     - NaNs should not be written to min or max statistics fields.
    *     - If the computed max value is zero (whether negative or positive),
@@ -1317,30 +1317,30 @@ struct FileMetaData {
    */
   7: optional list<ColumnOrder> column_orders;
 
-  /** 
+  /**
    * Encryption algorithm. This field is set only in encrypted files
    * with plaintext footer. Files with encrypted footer store algorithm id
    * in FileCryptoMetaData structure.
    */
   8: optional EncryptionAlgorithm encryption_algorithm
 
-  /** 
-   * Retrieval metadata of key used for signing the footer. 
-   * Used only in encrypted files with plaintext footer. 
-   */ 
+  /**
+   * Retrieval metadata of key used for signing the footer.
+   * Used only in encrypted files with plaintext footer.
+   */
   9: optional binary footer_signing_key_metadata
 }
 
 /** Crypto metadata for files with encrypted footer **/
 struct FileCryptoMetaData {
-  /** 
+  /**
    * Encryption algorithm. This field is only used for files
    * with encrypted footer. Files with plaintext footer store algorithm id
    * inside footer (FileMetaData structure).
    */
   1: required EncryptionAlgorithm encryption_algorithm
-    
-  /** Retrieval metadata of key used for encryption of footer, 
+
+  /** Retrieval metadata of key used for encryption of footer,
    *  and (possibly) columns **/
   2: optional binary key_metadata
 }
