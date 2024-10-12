@@ -269,36 +269,43 @@ enum GeometryEncoding {
 
 /**
  * Interpretation for edges of elements of a GEOMETRY logical type. In other
- * words, whether a point between two vertices should be interpolated in
- * its XY dimensions as if it were a Cartesian line connecting the two
- * vertices (planar) or the shortest spherical arc between the longitude
- * and latitude represented by the two vertices (spherical). This value
- * applies to all non-point geometry objects and is independent of the
- * coordinate reference system.
+ * words, whether points between two vertices should be interpolated in their
+ * XY dimensions as if they were on a straight line connecting the two vertices
+ * in Cartesian coordinates (linear) or on the shortest arc on a sphere between
+ * the longitude and latitude represented by the two vertices (pseudo geodesic).
+ * This value applies to all non-point geometry objects.
  *
- * Because most systems currently assume planar edges and do not support
- * spherical edges, planar should be used as the default value.
+ * The LINEAR value is independent of the coordinate reference system.
+ * The PSEUDO_GEODESIC value requires a coordinate reference system associated
+ * to a geodetic reference frame and uses spherical formulas even on ellipsoid,
+ * with geodetic latitudes used without conversion to authalic or other auxiliary
+ * latitudes.
+ *
+ * Because most systems currently assume linear edge interpolations and do
+ * not support geodesics, linear should be used as the default value.
  */
 enum Edges {
-  PLANAR = 0;
-  SPHERICAL = 1;
+  LINEAR = 0;
+  PSEUDO_GEODESIC = 1;
 }
 
 /**
  * Bounding box of geometries in the representation of min/max value pair of
- * coordinates from each axis when Edges is planar. Values of Z and M are omitted
- * for 2D geometries. When Edges is spherical, the bounding box is in the form of
- * [westmost, eastmost, southmost, northmost], with necessary min/max values for
- * Z and M if needed.
+ * coordinates from each axis when the coordinate system is Cartesian.
+ * Values of Z and M are omitted for 2D geometries. When the edges are geodesics,
+ * the bounding box is in the form of [westmost, eastmost, southmost, northmost],
+ * with necessary min/max values for Z and M if needed. Note that the westmost
+ * value may be greater than the eastmost value if the bounding box crosses the
+ * anti-meridian.
  */
 struct BoundingBox {
-  /** Westmost value if edges = spherical **/
+  /** Westmost value if the edges are geodesics **/
   1: required double xmin;
-  /** Eastmost value if edges = spherical **/
+  /** Eastmost value if the edges are geodesics **/
   2: required double xmax;
-  /** Southmost value if edges = spherical **/
+  /** Southmost value if the edges are geodesics **/
   3: required double ymin;
-  /** Northmost value if edges = spherical **/
+  /** Northmost value if the edges are geodesics **/
   4: required double ymax;
   5: optional double zmin;
   6: optional double zmax;
@@ -934,7 +941,7 @@ struct ColumnMetaData {
   /** total byte size of all uncompressed pages in this column chunk (including the headers) **/
   6: required i64 total_uncompressed_size
 
-  /** total byte size of all compressed, and potentially encrypted, pages 
+  /** total byte size of all compressed, and potentially encrypted, pages
    *  in this column chunk (including the headers) **/
   7: required i64 total_compressed_size
 
@@ -1049,10 +1056,10 @@ struct RowGroup {
    * in this row group **/
   5: optional i64 file_offset
 
-  /** Total byte size of all compressed (and potentially encrypted) column data 
+  /** Total byte size of all compressed (and potentially encrypted) column data
    *  in this row group **/
   6: optional i64 total_compressed_size
-  
+
   /** Row group ordinal in the file **/
   7: optional i16 ordinal
 }
@@ -1117,7 +1124,7 @@ union ColumnOrder {
    *     - If the min is +0, the row group may contain -0 values as well.
    *     - If the max is -0, the row group may contain +0 values as well.
    *     - When looking for NaN values, min and max should be ignored.
-   * 
+   *
    *     When writing statistics the following rules should be followed:
    *     - NaNs should not be written to min or max statistics fields.
    *     - If the computed max value is zero (whether negative or positive),
@@ -1310,30 +1317,30 @@ struct FileMetaData {
    */
   7: optional list<ColumnOrder> column_orders;
 
-  /** 
+  /**
    * Encryption algorithm. This field is set only in encrypted files
    * with plaintext footer. Files with encrypted footer store algorithm id
    * in FileCryptoMetaData structure.
    */
   8: optional EncryptionAlgorithm encryption_algorithm
 
-  /** 
-   * Retrieval metadata of key used for signing the footer. 
-   * Used only in encrypted files with plaintext footer. 
-   */ 
+  /**
+   * Retrieval metadata of key used for signing the footer.
+   * Used only in encrypted files with plaintext footer.
+   */
   9: optional binary footer_signing_key_metadata
 }
 
 /** Crypto metadata for files with encrypted footer **/
 struct FileCryptoMetaData {
-  /** 
+  /**
    * Encryption algorithm. This field is only used for files
    * with encrypted footer. Files with plaintext footer store algorithm id
    * inside footer (FileMetaData structure).
    */
   1: required EncryptionAlgorithm encryption_algorithm
-    
-  /** Retrieval metadata of key used for encryption of footer, 
+
+  /** Retrieval metadata of key used for encryption of footer,
    *  and (possibly) columns **/
   2: optional binary key_metadata
 }
